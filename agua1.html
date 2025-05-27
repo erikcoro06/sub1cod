@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Presupuesto para Captación de Agua Pluvial</title>
+    <link href="https://fonts.googleapis.com/css?family=Segoe+UI:400,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="agua1.css">
+</head>
+<body>
+    <a id="inicio"></a>
+    <div class="wrapper">
+        <h1>Calculadora de Presupuesto<br>Captación de Agua Pluvial</h1>
+        <form id="budget-form" autocomplete="off">
+            <div class="form-group">
+                <label for="roof-area">Área de captación (m²)</label>
+                <input type="number" id="roof-area" min="1" step="0.1" placeholder="Ej: 50" required>
+            </div>
+            <div class="form-group">
+                <label for="rainfall">Precipitación media diaria (mm)</label>
+                <input type="number" id="rainfall" min="0.1" step="0.1" placeholder="Ej: 5.2" required>
+            </div>
+            <div class="form-group">
+                <label for="storage-days">Días de almacenamiento deseados</label>
+                <input type="number" id="storage-days" min="1" step="1" placeholder="Ej: 30" required>
+            </div>
+            <div class="form-group">
+                <label for="system-type">Tipo de sistema</label>
+                <select id="system-type" required>
+                    <option value="basic">Básico (canaletas + filtro + tanque)</option>
+                    <option value="intermediate">Intermedio (+ bomba y distribución)</option>
+                    <option value="complete">Completo (+ tratamiento y automatización)</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="submit" id="calculate-btn" style="background:#27ae60;">Calcular</button>
+                <button type="button" id="reset-btn" style="background:#e74c3c;">Limpiar</button>
+            </div>
+        </form>
+        <div id="results" class="results" style="display:none;">
+            <h3 style="margin-top:0;">Resultados del Cálculo</h3>
+            <div class="result-item">
+                <span>Agua captable por día:</span>
+                <span id="daily-capture">0</span> litros
+            </div>
+            <div class="result-item"></div>
+                <span>Capacidad de almacenamiento necesaria:</span>
+                <span id="storage-needed">0</span> litros
+            </div>
+            <div class="materials-list" id="materials-list">
+                <!-- Materiales aquí -->
+            </div>
+            <div class="result-item" id="budget-result"></div>
+                <span>Presupuesto estimado:</span>
+                <span id="total-budget">0</span> MXN
+            </div>
+            <div class="form-actions" style="margin-top:16px;">
+                <a href="Index.html" id="back-to-top" style="display:inline-block; padding:8px 16px; background:#3498db; color:#fff; border:none; border-radius:4px; text-decoration:none;">Volver al Inicio</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        function formatNumber(n) {
+            return Number(n).toLocaleString('es-MX', {maximumFractionDigits: 1});
+        }
+
+        function resetForm() {
+            document.getElementById('budget-form').reset();
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('materials-list').innerHTML = '';
+        }
+
+        function calculateBudget() {
+            const roofArea = parseFloat(document.getElementById('roof-area').value);
+            const rainfall = parseFloat(document.getElementById('rainfall').value);
+            const storageDays = parseInt(document.getElementById('storage-days').value);
+            const systemType = document.getElementById('system-type').value;
+
+            if (isNaN(roofArea) || isNaN(rainfall) || isNaN(storageDays) ||
+                roofArea <= 0 || rainfall <= 0 || storageDays <= 0) {
+                alert("Por favor complete todos los campos con valores válidos.");
+                return;
+            }
+
+            const dailyCapture = roofArea * rainfall * 0.9;
+            const storageNeeded = dailyCapture * storageDays;
+
+            let materials = [];
+            materials.push({
+                name: "Canaletas de PVC",
+                quantity: Math.ceil(roofArea / 10),
+                unit: "metros",
+                unitCost: 5,
+                description: "Canaletas para recolectar agua del techo"
+            });
+            materials.push({
+                name: "Filtro de hojas y sedimentos",
+                quantity: 1,
+                unit: "unidad",
+                unitCost: 80,
+                description: "Filtro para remover hojas y partículas grandes"
+            });
+
+            materials.push({
+                name: "Tubería de conducción",
+                quantity: Math.ceil(roofArea / 20) * 3,
+                unit: "metros",
+                unitCost: 3,
+                description: "Tubería para llevar agua al tanque de almacenamiento"
+            });
+            const tankSize = storageNeeded < 1000 ? 1000 :
+                            storageNeeded < 5000 ? 5000 :
+                            storageNeeded < 10000 ? 10000 : 20000;
+            materials.push({
+                name: "Tanque de almacenamiento",
+                quantity: 1,
+                unit: `${tankSize} litros`,
+                unitCost: tankSize * 0.8,
+                description: `Tanque para almacenar hasta ${tankSize} litros de agua`
+            });
+            if (systemType !== "basic") {
+                materials.push({
+                    name: "Bomba eléctrica",
+                    quantity: 1,
+                    unit: "unidad",
+                    unitCost: 150,
+                    description: "Bomba para distribución del agua"
+                });
+                materials.push({
+                    name: "Sistema de distribución",
+                    quantity: Math.ceil(roofArea / 10),
+                    unit: "metros",
+                    unitCost: 4,
+                    description: "Tuberías para distribución del agua"
+                });
+                if (systemType === "complete") {
+                    materials.push({
+                        name: "Sistema de tratamiento",
+                        quantity: 1,
+                        unit: "unidad",
+                        unitCost: 300,
+                        description: "Filtros y desinfección para agua potable"
+                    });
+                    materials.push({
+                        name: "Controlador automático",
+                        quantity: 1,
+                        unit: "unidad",
+                        unitCost: 200,
+                        description: "Sistema de monitoreo y control automático"
+                    });
+                }
+            }
+            const totalCost = materials.reduce((sum, m) => sum + (m.quantity * m.unitCost), 0);
+
+            document.getElementById('daily-capture').textContent = formatNumber(dailyCapture);
+            document.getElementById('storage-needed').textContent = formatNumber(storageNeeded);
+            document.getElementById('total-budget').textContent = formatNumber(totalCost.toFixed(2));
+
+            const materialsList = document.getElementById('materials-list');
+            materialsList.innerHTML = '<h4>Materiales requeridos:</h4>';
+            materials.forEach(material => {
+                const materialCost = material.quantity * material.unitCost;
+                const materialDiv = document.createElement('div');
+                materialDiv.className = 'material-item';
+                materialDiv.innerHTML = `
+                    <div class="material-title">
+                        ${material.name} (${material.quantity} ${material.unit} @ $${formatNumber(material.unitCost)}/${material.unit.split(' ')[0]})
+                        <span class="tooltip info-icon">ℹ️
+                            <span class="tooltiptext">${material.description}</span>
+                        </span>
+                    </div>
+                    <div class="result-item" style="border-bottom:none;">
+                        <span>Costo:</span>
+                        <span>$${formatNumber(materialCost.toFixed(2))}</span>
+                    </div>
+                `;
+                materialsList.appendChild(materialDiv);
+            });
+
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({behavior: "smooth"});
+        }
+
+        document.getElementById('budget-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateBudget();
+        });
+        document.getElementById('reset-btn').addEventListener('click', resetForm);
+    </script>
+</body>
+</html>

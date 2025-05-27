@@ -1,0 +1,51 @@
+ body {
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Fondo con imagen de lago y degradado */
+            background: linear-gradient(rgba(44, 62, 80, 0.5), rgba(52, 152, 219, 0.5)),
+                url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+        }
+        .container {
+            max-width: 420px;
+            margin: 80px auto;
+            background: rgba(255,255,255,0.13);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+            padding: 38px 30px 32px 30px;
+            text-align: center;
+            backdrop-filter: blur(3px);
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 28px;
+            color: #eaf6fb;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 8px #2980b9;
+        }
+        .main-btn {
+            display: block;
+            width: 100%;
+            margin: 16px 0;
+            padding: 15px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #3498db 60%, #5dade2 100%);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(52,152,219,0.13);
+            transition: background 0.2s, transform 0.2s;
+        }
+        .main-btn:hover {
+            background: linear-gradient(90deg, #2471a3 60%, #2980b9 100%);
+            transform: translateY(-2px) scale(1.03);
+        }
+        @media (max-width: 600px) {
+            .container { max-width: 98vw; padding: 18px 4vw 16px 4vw;}
+            h1 { font-size: 1.3rem; }
+        }
